@@ -10,6 +10,7 @@ export const salonsTable = pgTable("salons", {
   address: text("address").notNull(),
   openTime: text("open_time").notNull().default("09:00"),
   closeTime: text("close_time").notNull().default("20:00"),
+  pin: text("pin").notNull().default("0000"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

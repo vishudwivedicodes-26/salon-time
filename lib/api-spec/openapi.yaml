@@ -23,7 +23,6 @@ paths:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -63,6 +62,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Salon"
+
+  /salons/login:
+    post:
+      operationId: salonLogin
+      tags: [salons]
+      summary: Verify salon owner PIN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalonLoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Salon"
+        "401":
+          description: Invalid PIN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Salon not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /salons/{salonId}:
     get:
@@ -168,7 +198,7 @@ paths:
     get:
       operationId: getBookings
       tags: [bookings]
-      summary: List all bookings (for a salon by salonId query param)
+      summary: List bookings
       parameters:
         - name: salonId
           in: query
@@ -240,7 +270,7 @@ paths:
     patch:
       operationId: updateBookingStatus
       tags: [bookings]
-      summary: Update booking status (confirm, cancel, complete)
+      summary: Update booking status
       parameters:
         - name: bookingId
           in: path
@@ -323,6 +353,9 @@ components:
           type: string
         closeTime:
           type: string
+        pin:
+          type: string
+          description: 4-digit PIN for owner dashboard access
       required:
         - name
         - ownerName
@@ -330,6 +363,18 @@ components:
         - address
         - openTime
         - closeTime
+        - pin
+
+    SalonLoginInput:
+      type: object
+      properties:
+        salonId:
+          type: integer
+        pin:
+          type: string
+      required:
+        - salonId
+        - pin
 
     Service:
       type: object

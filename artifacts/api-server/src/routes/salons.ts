@@ -9,22 +9,44 @@ import {
   GetAvailableSlotsParams,
   GetSalonParams,
   GetSalonServicesParams,
+  SalonLoginBody,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
+function stripPin(salon: { pin?: string; [key: string]: unknown }) {
+  const { pin: _pin, ...rest } = salon;
+  return rest;
+}
+
+function formatSalon(salon: { createdAt: Date; pin: string; [key: string]: unknown }) {
+  return stripPin({ ...salon, createdAt: salon.createdAt.toISOString() });
+}
+
 router.get("/salons", async (_req, res) => {
   const salons = await db.select().from(salonsTable);
-  res.json(salons.map(s => ({
-    ...s,
-    createdAt: s.createdAt.toISOString(),
-  })));
+  res.json(salons.map(s => formatSalon(s)));
 });
 
 router.post("/salons", async (req, res) => {
   const input = CreateSalonBody.parse(req.body);
   const [salon] = await db.insert(salonsTable).values(input).returning();
-  res.status(201).json({ ...salon, createdAt: salon.createdAt.toISOString() });
+  res.status(201).json(formatSalon(salon));
+});
+
+// Login must be before /:salonId so Express doesn't match "login" as a salonId
+router.post("/salons/login", async (req, res) => {
+  const { salonId, pin } = SalonLoginBody.parse(req.body);
+  const [salon] = await db.select().from(salonsTable).where(eq(salonsTable.id, salonId));
+  if (!salon) {
+    res.status(404).json({ error: "Salon not found" });
+    return;
+  }
+  if (salon.pin !== pin) {
+    res.status(401).json({ error: "Galat PIN hai. Dobara try karein." });
+    return;
+  }
+  res.json(formatSalon(salon));
 });
 
 router.get("/salons/:salonId", async (req, res) => {
@@ -34,7 +56,7 @@ router.get("/salons/:salonId", async (req, res) => {
     res.status(404).json({ error: "Salon not found" });
     return;
   }
-  res.json({ ...salon, createdAt: salon.createdAt.toISOString() });
+  res.json(formatSalon(salon));
 });
 
 router.get("/salons/:salonId/services", async (req, res) => {
@@ -84,17 +106,9 @@ router.get("/salons/:salonId/slots", async (req, res) => {
   }
 
   const existingBookings = await db.select().from(bookingsTable).where(
-    and(
-      eq(bookingsTable.salonId, salonId),
-      eq(bookingsTable.date, query.date),
-    )
+    and(eq(bookingsTable.salonId, salonId), eq(bookingsTable.date, query.date))
   );
-
-  const bookedTimes = new Set(
-    existingBookings
-      .filter(b => b.status !== "cancelled")
-      .map(b => b.time)
-  );
+  const bookedTimes = new Set(existingBookings.filter(b => b.status !== "cancelled").map(b => b.time));
 
   const slots = [];
   const [openH, openM] = salon.openTime.split(":").map(Number);

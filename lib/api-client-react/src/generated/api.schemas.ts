@@ -31,6 +31,13 @@ export interface CreateSalonInput {
   address: string;
   openTime: string;
   closeTime: string;
+  /** 4-digit PIN for owner dashboard access */
+  pin: string;
+}
+
+export interface SalonLoginInput {
+  salonId: number;
+  pin: string;
 }
 
 export interface Service {

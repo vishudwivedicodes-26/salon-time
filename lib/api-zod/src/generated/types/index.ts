@@ -15,6 +15,7 @@ export * from "./getAvailableSlotsParams";
 export * from "./getBookingsParams";
 export * from "./healthStatus";
 export * from "./salon";
+export * from "./salonLoginInput";
 export * from "./service";
 export * from "./timeSlot";
 export * from "./updateBookingStatusInput";

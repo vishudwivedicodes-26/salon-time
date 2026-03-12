@@ -26,6 +26,7 @@ import type {
   GetBookingsParams,
   HealthStatus,
   Salon,
+  SalonLoginInput,
   Service,
   TimeSlot,
   UpdateBookingStatusInput,
@@ -41,7 +42,6 @@ type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const getHealthCheckUrl = () => {
@@ -265,6 +265,92 @@ export const useCreateSalon = <
   TContext
 > => {
   return useMutation(getCreateSalonMutationOptions(options));
+};
+
+/**
+ * @summary Verify salon owner PIN
+ */
+export const getSalonLoginUrl = () => {
+  return `/api/salons/login`;
+};
+
+export const salonLogin = async (
+  salonLoginInput: SalonLoginInput,
+  options?: RequestInit,
+): Promise<Salon> => {
+  return customFetch<Salon>(getSalonLoginUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(salonLoginInput),
+  });
+};
+
+export const getSalonLoginMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof salonLogin>>,
+    TError,
+    { data: BodyType<SalonLoginInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof salonLogin>>,
+  TError,
+  { data: BodyType<SalonLoginInput> },
+  TContext
+> => {
+  const mutationKey = ["salonLogin"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof salonLogin>>,
+    { data: BodyType<SalonLoginInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return salonLogin(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SalonLoginMutationResult = NonNullable<
+  Awaited<ReturnType<typeof salonLogin>>
+>;
+export type SalonLoginMutationBody = BodyType<SalonLoginInput>;
+export type SalonLoginMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Verify salon owner PIN
+ */
+export const useSalonLogin = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof salonLogin>>,
+    TError,
+    { data: BodyType<SalonLoginInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof salonLogin>>,
+  TError,
+  { data: BodyType<SalonLoginInput> },
+  TContext
+> => {
+  return useMutation(getSalonLoginMutationOptions(options));
 };
 
 /**
@@ -642,7 +728,7 @@ export function useGetAvailableSlots<
 }
 
 /**
- * @summary List all bookings (for a salon by salonId query param)
+ * @summary List bookings
  */
 export const getGetBookingsUrl = (params?: GetBookingsParams) => {
   const normalizedParams = new URLSearchParams();
@@ -709,7 +795,7 @@ export type GetBookingsQueryResult = NonNullable<
 export type GetBookingsQueryError = ErrorType<unknown>;
 
 /**
- * @summary List all bookings (for a salon by salonId query param)
+ * @summary List bookings
  */
 
 export function useGetBookings<
@@ -909,7 +995,7 @@ export function useGetBooking<
 }
 
 /**
- * @summary Update booking status (confirm, cancel, complete)
+ * @summary Update booking status
  */
 export const getUpdateBookingStatusUrl = (bookingId: number) => {
   return `/api/bookings/${bookingId}`;
@@ -974,7 +1060,7 @@ export type UpdateBookingStatusMutationBody =
 export type UpdateBookingStatusMutationError = ErrorType<unknown>;
 
 /**
- * @summary Update booking status (confirm, cancel, complete)
+ * @summary Update booking status
  */
 export const useUpdateBookingStatus = <
   TError = ErrorType<unknown>,

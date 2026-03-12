@@ -13,4 +13,6 @@ export interface CreateSalonInput {
   address: string;
   openTime: string;
   closeTime: string;
+  /** 4-digit PIN for owner dashboard access */
+  pin: string;
 }

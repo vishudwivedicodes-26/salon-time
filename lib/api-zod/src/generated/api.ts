@@ -8,7 +8,6 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -40,6 +39,26 @@ export const CreateSalonBody = zod.object({
   address: zod.string(),
   openTime: zod.string(),
   closeTime: zod.string(),
+  pin: zod.string().describe("4-digit PIN for owner dashboard access"),
+});
+
+/**
+ * @summary Verify salon owner PIN
+ */
+export const SalonLoginBody = zod.object({
+  salonId: zod.number(),
+  pin: zod.string(),
+});
+
+export const SalonLoginResponse = zod.object({
+  id: zod.number(),
+  name: zod.string(),
+  ownerName: zod.string(),
+  phone: zod.string(),
+  address: zod.string(),
+  openTime: zod.string(),
+  closeTime: zod.string(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -113,7 +132,7 @@ export const GetAvailableSlotsResponse = zod.array(
 );
 
 /**
- * @summary List all bookings (for a salon by salonId query param)
+ * @summary List bookings
  */
 export const GetBookingsQueryParams = zod.object({
   salonId: zod.coerce.number().optional(),
@@ -170,7 +189,7 @@ export const GetBookingResponse = zod.object({
 });
 
 /**
- * @summary Update booking status (confirm, cancel, complete)
+ * @summary Update booking status
  */
 export const UpdateBookingStatusParams = zod.object({
   bookingId: zod.coerce.number(),
