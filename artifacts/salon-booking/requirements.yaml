@@ -1,0 +1,14 @@
+packages:
+  "date-fns": "For date formatting and manipulation"
+  "clsx": "Utility for constructing className strings"
+  "tailwind-merge": "Utility for merging tailwind classes safely"
+  "lucide-react": "Beautiful vector icons"
+
+images:
+  - path: "artifacts/salon-booking/public/images/hero.png"
+    description: "Luxurious modern salon interior with warm lighting, rose gold accents, elegant mirrors, and plush velvet seating, architectural digest style, highly detailed and photorealistic"
+    aspect_ratio: "16:9"
+
+notes:
+  - "Using custom UI components to ensure perfect styling and no missing dependencies"
+  - "Wrapping generated API hooks to add cache invalidation logic"

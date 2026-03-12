@@ -1,15 +1,22 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Salon Booking API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: salons
+    description: Salon management
+  - name: services
+    description: Salon services
+  - name: bookings
+    description: Appointment bookings
+  - name: slots
+    description: Available time slots
 paths:
   /healthz:
     get:
@@ -24,6 +31,236 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /salons:
+    get:
+      operationId: getSalons
+      tags: [salons]
+      summary: List all salons
+      responses:
+        "200":
+          description: List of salons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Salon"
+    post:
+      operationId: createSalon
+      tags: [salons]
+      summary: Create a salon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSalonInput"
+      responses:
+        "201":
+          description: Created salon
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Salon"
+
+  /salons/{salonId}:
+    get:
+      operationId: getSalon
+      tags: [salons]
+      summary: Get a salon by ID
+      parameters:
+        - name: salonId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Salon details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Salon"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /salons/{salonId}/services:
+    get:
+      operationId: getSalonServices
+      tags: [services]
+      summary: List services for a salon
+      parameters:
+        - name: salonId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+    post:
+      operationId: createService
+      tags: [services]
+      summary: Create a service for a salon
+      parameters:
+        - name: salonId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceInput"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
+  /salons/{salonId}/slots:
+    get:
+      operationId: getAvailableSlots
+      tags: [slots]
+      summary: Get available time slots for a salon
+      parameters:
+        - name: salonId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: serviceId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Available time slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimeSlot"
+
+  /bookings:
+    get:
+      operationId: getBookings
+      tags: [bookings]
+      summary: List all bookings (for a salon by salonId query param)
+      parameters:
+        - name: salonId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a new booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingInput"
+      responses:
+        "201":
+          description: Created booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Slot not available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /bookings/{bookingId}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get a booking by ID
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateBookingStatus
+      tags: [bookings]
+      summary: Update booking status (confirm, cancel, complete)
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookingStatusInput"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +271,184 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    Salon:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ownerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        openTime:
+          type: string
+        closeTime:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - ownerName
+        - phone
+        - address
+        - openTime
+        - closeTime
+        - createdAt
+
+    CreateSalonInput:
+      type: object
+      properties:
+        name:
+          type: string
+        ownerName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        openTime:
+          type: string
+        closeTime:
+          type: string
+      required:
+        - name
+        - ownerName
+        - phone
+        - address
+        - openTime
+        - closeTime
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        salonId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        durationMinutes:
+          type: integer
+        price:
+          type: number
+        createdAt:
+          type: string
+      required:
+        - id
+        - salonId
+        - name
+        - durationMinutes
+        - price
+        - createdAt
+
+    CreateServiceInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        durationMinutes:
+          type: integer
+        price:
+          type: number
+      required:
+        - name
+        - durationMinutes
+        - price
+
+    TimeSlot:
+      type: object
+      properties:
+        time:
+          type: string
+        available:
+          type: boolean
+      required:
+        - time
+        - available
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        salonId:
+          type: integer
+        serviceId:
+          type: integer
+        serviceName:
+          type: string
+        clientName:
+          type: string
+        clientPhone:
+          type: string
+        date:
+          type: string
+        time:
+          type: string
+        status:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - salonId
+        - serviceId
+        - serviceName
+        - clientName
+        - clientPhone
+        - date
+        - time
+        - status
+        - createdAt
+
+    CreateBookingInput:
+      type: object
+      properties:
+        salonId:
+          type: integer
+        serviceId:
+          type: integer
+        clientName:
+          type: string
+        clientPhone:
+          type: string
+        date:
+          type: string
+        time:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - salonId
+        - serviceId
+        - clientName
+        - clientPhone
+        - date
+        - time
+
+    UpdateBookingStatusInput:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
