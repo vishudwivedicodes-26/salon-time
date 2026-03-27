@@ -3,12 +3,12 @@ import {
   useGetBookings,
   useGetBooking,
   useGetAvailableSlots,
-  useCreateBooking as useGeneratedCreateBooking,
-  useUpdateBookingStatus as useGeneratedUpdateBookingStatus,
+  useCreateBooking,
+  useUpdateBookingStatus,
   getGetBookingsQueryKey,
   getGetAvailableSlotsQueryKey,
   getGetBookingQueryKey
-} from "@workspace/api-client-react";
+} from "../../../../lib/api-client-react/src/index";
 
 export function useBookings(salonId?: number, date?: string) {
   return useGetBookings({ salonId, date }, { query: { enabled: !!salonId } });

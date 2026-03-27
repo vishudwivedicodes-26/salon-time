@@ -5,7 +5,7 @@ import {
   useCreateSalon as useGeneratedCreateSalon,
   useSalonLogin as useGeneratedSalonLogin,
   getGetSalonsQueryKey
-} from "@workspace/api-client-react";
+} from "../../../../lib/api-client-react/src/index";
 
 const AUTH_KEY = "salon_owner_auth";
 
