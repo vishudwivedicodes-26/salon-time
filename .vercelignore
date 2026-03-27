@@ -1,0 +1,8 @@
+node_modules
+.git
+.config
+.local
+dist
+.replit
+artifacts/*/node_modules
+lib/*/node_modules

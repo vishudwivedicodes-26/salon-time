@@ -1,0 +1,101 @@
+git : remote: error: 
+GH013: Repository rule 
+violations found for 
+refs/heads/master.     
+   
+At line:1 char:1
++ git push origin 
+master -f 2>&1 | 
+Out-File -FilePath 
+push_log.txt -Enc ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (remote: error   
+ : ...master.          
+  :String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+remote: 
+remote: - GITHUB PUSH 
+PROTECTION        
+remote:   ?????????????
+???????????????????????
+???????????????????????
+???????????????????????
+???????????????????????
+??????????????????     
+   
+remote:     Resolve 
+the following 
+violations before 
+pushing again        
+remote: 
+remote:     - Push 
+cannot contain secrets 
+       
+remote: 
+remote:             
+remote:      (?) Learn 
+how to resolve a 
+blocked push        
+remote:      https://do
+cs.github.com/code-secu
+rity/secret-scanning/wo
+rking-with-secret-scann
+ing-and-push-protection
+/working-with-push-prot
+ection-from-the-command
+-line#resolving-a-block
+ed-push        
+remote:             
+remote:             
+remote:       ?????? 
+Slack Incoming Webhook 
+URL ???????????????????
+???????????????????????
+???????????????????????
+???????        
+remote:        
+locations:        
+remote:          - 
+commit: 96f7d0853d9614c
+eff4a82c899ba9f8fbbfa69
+4b        
+remote:            
+path: .config/replit/.s
+emgrep/semgrep_rules.js
+on:34097        
+remote:             
+remote:        (?) To 
+push, remove secret 
+from commit(s) or 
+follow this URL to 
+allow the secret.      
+  
+remote:        https://
+github.com/vishudwivedi
+codes-26/salon-time/sec
+urity/secret-scanning/u
+nblock-secret/3BXSc9Fkf
+soOoubZkOhWj2B6Pu1     
+   
+remote:             
+remote: 
+remote: 
+To https://github.com/v
+ishudwivedicodes-26/sal
+on-time.git
+ ! [remote rejected] 
+master -> master (push 
+declined due to 
+repository rule 
+violations)
+error: failed to push 
+some refs to 'https://g
+ithub.com/vishudwivedic
+odes-26/salon-time.git'
