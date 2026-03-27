@@ -18,6 +18,10 @@
     "lib/integrations/*",
     "scripts"
   ],
+  "dependencies": {
+    "express": "^5",
+    "cors": "^2"
+  },
   "devDependencies": {
     "typescript": "~5.9.2",
     "prettier": "^3.8.1"
