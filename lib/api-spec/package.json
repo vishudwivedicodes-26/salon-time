@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build": "orval --config ./orval.config.ts",
     "codegen": "orval --config ./orval.config.ts"
   },
   "devDependencies": {
