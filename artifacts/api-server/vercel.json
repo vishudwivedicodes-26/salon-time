@@ -1,5 +1,4 @@
 {
   "version": 2,
-  "installCommand": "pnpm install --ignore-scripts",
   "rewrites": [{ "source": "/api/(.*)", "destination": "src/index.ts" }]
 }
