@@ -3,8 +3,8 @@ import {
   useGetBookings,
   useGetBooking,
   useGetAvailableSlots,
-  useCreateBooking,
-  useUpdateBookingStatus,
+  useCreateBooking as useGeneratedCreateBooking,
+  useUpdateBookingStatus as useGeneratedUpdateBookingStatus,
   getGetBookingsQueryKey,
   getGetAvailableSlotsQueryKey,
   getGetBookingQueryKey
@@ -20,8 +20,8 @@ export function useBooking(id: number) {
 
 export function useAvailableSlots(salonId: number, date: string, serviceId?: number) {
   return useGetAvailableSlots(
-    salonId, 
-    { date, serviceId }, 
+    salonId,
+    { date, serviceId },
     { query: { enabled: !!salonId && !!date } }
   );
 }

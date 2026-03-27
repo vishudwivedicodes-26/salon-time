@@ -5,7 +5,6 @@ import path from "path";
 
 const rawPort = process.env.PORT || "3000";
 const port = Number(rawPort);
-
 const basePath = process.env.BASE_PATH || "/";
 
 export default defineConfig({
@@ -30,10 +29,6 @@ export default defineConfig({
     port,
     host: "0.0.0.0",
     allowedHosts: true,
-    fs: {
-      strict: true,
-      deny: ["**/.*"],
-    },
   },
   preview: {
     port,
