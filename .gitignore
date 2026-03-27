@@ -9,7 +9,10 @@ out-tsc
 .expo-shared
 
 # dependencies
-node_modules
+.config/
+.local/
+node_modules/
+dist/
 
 # IDEs and editors
 /.idea
