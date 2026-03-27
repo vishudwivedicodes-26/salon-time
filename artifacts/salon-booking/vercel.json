@@ -2,5 +2,6 @@
   "version": 2,
   "framework": "vite",
   "outputDirectory": "dist",
+  "installCommand": "cd ../.. && pnpm install --ignore-scripts",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
