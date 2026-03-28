@@ -7,7 +7,8 @@
     "node": "22.x"
   },
   "scripts": {
-    "build": "pnpm -r --filter @workspace/salon-booking run build && mkdir -p dist && cp -r artifacts/salon-booking/dist/* dist/",
+    "build": "node scripts/build-prod.js",
+    "dev": "pnpm -r --filter @workspace/api-server --filter @workspace/salon-booking --parallel dev",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
@@ -25,5 +26,10 @@
   "devDependencies": {
     "typescript": "~5.9.2",
     "prettier": "^3.8.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": "npm:@rollup/wasm-node"
+    }
   }
 }

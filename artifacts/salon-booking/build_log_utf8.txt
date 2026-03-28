@@ -1,0 +1,82 @@
+﻿node.exe : npm warn 
+Unknown project config 
+"auto-install-peers". This 
+will stop working in the 
+next major version of npm.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (npm  
+   warn Unknow...version   
+  of npm.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+npm warn Unknown project 
+config "strict-peer-depende
+ncies". This will stop 
+working in the next major 
+version of npm.
+[31mfailed to load config 
+from C:\sunday s\Salon-Conn
+ect\artifacts\salon-booking
+\vite.config.ts[39m
+[31merror during build:
+Error [ERR_PACKAGE_PATH_NOT
+_EXPORTED]: Package 
+subpath './internal' is 
+not defined by "exports" 
+in C:\sunday s\Salon-Connec
+t\node_modules\.pnpm\@vitej
+s+plugin-react@6.0.1__17d91
+dd192d2d93878829590e48e386f
+\node_modules\vite\package.
+json imported from 
+C:\sunday s\Salon-Connect\n
+ode_modules\.pnpm\@vitejs+p
+lugin-react@6.0.1__17d91dd1
+92d2d93878829590e48e386f\no
+de_modules\@vitejs\plugin-r
+eact\dist\index.js
+    at exportsNotFound (nod
+e:internal/modules/esm/reso
+lve:314:10)
+    at 
+packageExportsResolve (node
+:internal/modules/esm/resol
+ve:662:9)
+    at packageResolve (node
+:internal/modules/esm/resol
+ve:774:12)
+    at moduleResolve (node:
+internal/modules/esm/resolv
+e:859:18)
+    at defaultResolve (node
+:internal/modules/esm/resol
+ve:991:11)
+    at 
+#cachedDefaultResolve (node
+:internal/modules/esm/loade
+r:719:20)
+    at #resolveAndMaybeBloc
+kOnLoaderThread (node:inter
+nal/modules/esm/loader:736:
+38)
+    at 
+ModuleLoader.resolveSync (n
+ode:internal/modules/esm/lo
+ader:765:52)
+    at #resolve (node:inter
+nal/modules/esm/loader:701:
+17)
+    at ModuleLoader.getOrCr
+eateModuleJob (node:interna
+l/modules/esm/loader:621:35
+)[39m

@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, salonsTable, servicesTable, bookingsTable } from "@workspace/db";
+import { db, salonsTable, servicesTable, bookingsTable } from "../lib/db/index";
 import { eq, and } from "drizzle-orm";
 import {
   CreateSalonBody,
@@ -10,7 +10,7 @@ import {
   GetSalonParams,
   GetSalonServicesParams,
   SalonLoginBody,
-} from "@workspace/api-zod";
+} from "../lib/api-zod/index";
 
 const router: IRouter = Router();
 

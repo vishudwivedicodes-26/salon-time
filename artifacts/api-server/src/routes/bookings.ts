@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, bookingsTable, servicesTable } from "@workspace/db";
+import { db, bookingsTable, servicesTable } from "../lib/db/index";
 import { eq, and } from "drizzle-orm";
 import {
   CreateBookingBody,
@@ -7,7 +7,7 @@ import {
   GetBookingsQueryParams,
   UpdateBookingStatusBody,
   UpdateBookingStatusParams,
-} from "@workspace/api-zod";
+} from "../lib/api-zod/index";
 
 const router: IRouter = Router();
 

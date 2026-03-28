@@ -4,8 +4,9 @@ import {
   useGetSalon,
   useCreateSalon as useGeneratedCreateSalon,
   useSalonLogin as useGeneratedSalonLogin,
-  getGetSalonsQueryKey
-} from "../../../../lib/api-client-react/src/index";
+  getGetSalonsQueryKey,
+  getGetSalonQueryKey
+} from "@workspace/api-client-react";
 
 const AUTH_KEY = "salon_owner_auth";
 
@@ -42,7 +43,10 @@ export function useSalons() {
 }
 
 export function useSalon(id: number) {
-  return useGetSalon(id, { query: { enabled: !!id } });
+  return useGetSalon(
+    id,
+    { query: { enabled: !!id, queryKey: getGetSalonQueryKey(id) } }
+  );
 }
 
 export function useCreateSalon() {

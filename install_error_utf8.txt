@@ -1,0 +1,83 @@
+﻿ΓÇëWARNΓÇë Unsupported engine: wanted: {"node":"22.x"} (current: {"node":"v24.14.0","pnpm":"10.32.1"})
+Scope: all 9 workspace projects
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 65, reused 64, downloaded 0, added 0
+Progress: resolved 89, reused 89, downloaded 0, added 0
+C:\sunday s\Salon-Connect\artifacts\api-server:
+ΓÇëERR_PNPM_NO_MATCHING_VERSIONΓÇë No matching version found for drizzle-zod@^0.45.1 while fetching it from https://registry.npmjs.org/
+
+This error happened while installing a direct dependency of C:\sunday s\Salon-Connect\artifacts\api-server
+
+The latest release of drizzle-zod is "0.8.3". Published at 6/8/2025
+
+Other releases are:
+  * rename-api-version: 0.1.2-a4e41dd published at 26/1/2023
+  * 174/merge: 0.1.3-ac3f325 published at 13/2/2023
+  * dankochetov-patch-1: 0.4.1-dadcac0 published at 5/5/2023
+  * fix-fk-imports: 0.5.0-ae63c6e published at 9/8/2023
+  * types-bugs: 0.5.1-b0f0ac9 published at 24/8/2023
+  * readme: 0.5.1-b597b90 published at 3/1/2024
+  * AlexBlokh-patch-1: 0.5.1-0a94f2e published at 22/2/2024
+  * pipeline-updates: 0.5.1-96c8046 published at 19/3/2024
+  * expo: 0.5.1-7a4cc2d published at 4/6/2024
+  * tidb: 0.5.1-5b29cb4 published at 6/6/2024
+  * prisma-driver: 0.5.1-f9f4c2e published at 9/6/2024
+  * generated-internal: 0.5.1-e7cf338 published at 25/6/2024
+  * tsvector-helpers: 0.5.1-aaea9bd published at 27/6/2024
+  * fix-rqb-tables-with-schema: 0.5.1-ee089d9 published at 6/7/2024
+  * generated: 0.5.1-aaf764c published at 9/7/2024
+  * fix-rqb-typings: 0.5.1-848e136 published at 25/7/2024
+  * kit: 0.5.1-3d4e79a published at 1/8/2024
+  * pglite: 0.5.1-626cc95 published at 23/8/2024
+  * migrations3: 0.5.1-b921e79 published at 29/8/2024
+  * drizzle-kit/libsql-push-migrate: 0.5.1-1321cf9 published at 4/9/2024
+  * count-generator: 0.5.1-8cf7a61 published at 5/9/2024
+  * optimize: 0.5.1-605ef48 published at 13/9/2024
+  * newtypes: 0.5.1-57d2372 published at 22/10/2024
+  * is-config-fixes: 0.5.1-4b33aac published at 25/11/2024
+  * drizzle-kit/singlestore-recreate: 0.6.1-88fe396 published at 23/1/2025
+  * drizzle-kit/fix-recreate: 0.7.0-dc3b366 published at 19/2/2025
+  * numeric-modes: 0.7.0-867d080 published at 18/3/2025
+  * rqb-v1-schema-fix: 0.7.0-b96a4f8 published at 19/3/2025
+  * optimize-tests-main: 0.7.0-83f67e4 published at 19/3/2025
+  * deduplicate-exports: 0.7.1-014cdb8 published at 15/4/2025
+  * mssql: 0.7.1-f677fb2 published at 2/5/2025
+  * test-pipeline: 0.7.1-08944da published at 15/5/2025
+  * exts-s3-file: 0.8.2-512acc4 published at 12/6/2025
+  * sqlite-better-blob: 0.8.3-5f2d36c published at 21/8/2025
+  * rqb-typeperf: 0.8.2-69a2ca0 published at 29/8/2025
+  * effect: 0.8.3-cdf226f published at 12/9/2025
+  * main-next-pack: 0.8.3-82993ae published at 4/11/2025
+  * kit-checks: 0.8.3-391d33b published at 13/11/2025
+  * ext-deps-kit: 0.8.3-59e351d published at 17/11/2025
+  * workflows: 0.8.3-37e2608 published at 19/11/2025
+  * sqlite-cloud-studio: 0.8.3-bc61bbe published at 21/11/2025
+  * beta-next-pack: 0.8.3-140e6cc published at 26/11/2025
+  * alternation-engine: 1.0.0-beta.2-6565b14 published at 2/12/2025
+  * main-workflows: 0.8.3-6357645 published at 4/12/2025
+  * kit-cli-wrong-config-hints: 1.0.0-beta.2-a1a6b39 published at 4/12/2025
+  * studio-benchmark: 1.0.0-beta.2-01787d6 published at 10/12/2025
+  * rqb-perf-patch: 1.0.0-beta.2-f9236e3 published at 13/12/2025
+  * kit-duckdb: 1.0.0-beta.2-d4ff358 published at 17/12/2025
+  * mysql-blob-rqb-v2-fix: 1.0.0-beta.5-e0482ac published at 23/12/2025
+  * beta-fixes: 1.0.0-beta.6-7419dcb published at 26/12/2025
+  * beelink: 1.0.0-beta.9-c26fd2f published at 7/1/2026
+  * effect3: 1.0.0-beta.9-635dfc2 published at 7/1/2026
+  * effect-fixes: 1.0.0-beta.10-9f1399e published at 9/1/2026
+  * bun-timestampstring-patch: 1.0.0-beta.10-4a698ad published at 13/1/2026
+  * drizzle-seed/bug-fixes: 1.0.0-beta.10-7f0f68a published at 13/1/2026
+  * issues: 1.0.0-beta.11-165921d published at 15/1/2026
+  * effect-cache-fix: 1.0.0-beta.11-88ca292 published at 16/1/2026
+  * data-migrator: 1.0.0-beta.11-c3fb442 published at 16/1/2026
+  * effect-validator: 1.0.0-beta.12-d1c2b4c published at 26/1/2026
+  * update/migrator-strategy: 1.0.0-beta.12-5845444 published at 27/1/2026
+  * drizzle-effect: 1.0.0-beta.13-f16bdca published at 3/2/2026
+  * pg-prepare-nameless: 1.0.0-beta.13-4ef3fca published at 4/2/2026
+  * kit-introspect: 1.0.0-beta.13-ba3365d published at 4/2/2026
+  * issues2: 1.0.0-beta.14-89db290 published at 4/2/2026
+  * beta: 1.0.0-beta.14-a36c63d published at 4/2/2026
+  * sql-explicit-origin: 1.0.0-beta.14-56703c9 published at 5/2/2026
+  * kit-updates: 0.8.3-a7a15d0 published at 16/3/2026
+  * identifiers: 0.8.3-4537073 published at 27/3/2026 9:05:36 pm
+
+If you need the full list of all 1256 published versions run "pnpm view drizzle-zod versions".

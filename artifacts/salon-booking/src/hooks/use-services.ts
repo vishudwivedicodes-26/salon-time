@@ -3,10 +3,13 @@ import {
   useGetSalonServices,
   useCreateService as useGeneratedCreateService,
   getGetSalonServicesQueryKey,
-} from "../../../../lib/api-client-react/src/index";
+} from "@workspace/api-client-react";
 
 export function useServices(salonId: number) {
-  return useGetSalonServices(salonId, { query: { enabled: !!salonId } });
+  return useGetSalonServices(
+    salonId,
+    { query: { enabled: !!salonId, queryKey: getGetSalonServicesQueryKey(salonId) } }
+  );
 }
 
 export function useCreateService(salonId: number) {

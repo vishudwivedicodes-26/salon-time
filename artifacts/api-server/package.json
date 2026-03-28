@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.32.1",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development tsx ./src/index.ts",
+    "dev": "tsx --env-file=../../.env ./src/index.ts",
     "build": "tsx ./build.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -15,7 +15,10 @@
     "drizzle-orm": "^0.45.1",
     "express": "^5",
     "cookie-parser": "^1.4.7",
-    "cors": "^2"
+    "cors": "^2",
+    "pg": "^8.20.0",
+    "drizzle-zod": "^0.8.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",

@@ -6,23 +6,29 @@ import {
   useCreateBooking as useGeneratedCreateBooking,
   useUpdateBookingStatus as useGeneratedUpdateBookingStatus,
   getGetBookingsQueryKey,
+  getGetBookingQueryKey,
   getGetAvailableSlotsQueryKey,
-  getGetBookingQueryKey
-} from "../../../../lib/api-client-react/src/index";
+} from "@workspace/api-client-react";
 
 export function useBookings(salonId?: number, date?: string) {
-  return useGetBookings({ salonId, date }, { query: { enabled: !!salonId } });
+  return useGetBookings(
+    { salonId, date },
+    { query: { enabled: !!salonId, queryKey: getGetBookingsQueryKey({ salonId, date }) } }
+  );
 }
 
 export function useBooking(id: number) {
-  return useGetBooking(id, { query: { enabled: !!id } });
+  return useGetBooking(
+    id,
+    { query: { enabled: !!id, queryKey: getGetBookingQueryKey(id) } }
+  );
 }
 
 export function useAvailableSlots(salonId: number, date: string, serviceId?: number) {
   return useGetAvailableSlots(
     salonId,
     { date, serviceId },
-    { query: { enabled: !!salonId && !!date } }
+    { query: { enabled: !!salonId && !!date, queryKey: getGetAvailableSlotsQueryKey(salonId, { date, serviceId }) } }
   );
 }
 

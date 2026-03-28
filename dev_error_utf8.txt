@@ -1,0 +1,30 @@
+﻿ΓÇëWARNΓÇë Unsupported engine: wanted: {"node":"22.x"} (current: {"node":"v24.14.0","pnpm":"10.32.1"})
+
+> workspace@0.0.0 dev C:\sunday s\Salon-Connect
+> pnpm -r --parallel dev
+
+.                                        | ΓÇëWARNΓÇë Unsupported engine: wanted: {"node":"22.x"} (current: {"node":"v24.14.0","pnpm":"10.32.1"})
+Scope: 8 of 9 workspace projects
+artifacts/api-server dev$ tsx --env-file=../../.env ./src/index.ts
+artifacts/mockup-sandbox dev$ vite dev
+artifacts/salon-booking dev$ vite --config vite.config.ts --host 0.0.0.0
+artifacts/salon-booking dev:   [32m[1mVITE[22m v6.4.1[39m  [2mready in [0m[1m3975[22m[2m[0m ms[22m
+artifacts/salon-booking dev:   [32mΓ₧£[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3000[22m/[39m
+artifacts/salon-booking dev:   [32mΓ₧£[39m  [1mNetwork[22m: [36mhttp://10.73.199.157:[1m3000[22m/[39m
+artifacts/mockup-sandbox dev: [31mfailed to load config from C:\sunday s\Salon-Connect\artifacts\mockup-sandbox\vite.config.ts[39m
+artifacts/mockup-sandbox dev: [31merror when starting dev server:
+artifacts/mockup-sandbox dev: Error: PORT environment variable is required but was not provided.
+artifacts/mockup-sandbox dev:     at file:///C:/sunday%20s/Salon-Connect/artifacts/mockup-sandbox/node_modules/.vite-temp/vite.config.ts.timestamp-1774660241444-f1877ff684dbd.mjs:145:9
+artifacts/mockup-sandbox dev:     at ModuleJob.run (node:internal/modules/esm/module_job:430:25)
+artifacts/mockup-sandbox dev:     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:661:26)
+artifacts/mockup-sandbox dev:     at async loadConfigFromBundledFile (file:///C:/sunday%20s/Salon-Connect/node_modules/.pnpm/vite@7.3.1_@types+node@25.5_dd6475a36cad374b548325afcd4c0c34/node_modules/vite/dist/node/chunks/config.js:35909:12)
+artifacts/mockup-sandbox dev:     at async bundleAndLoadConfigFile (file:///C:/sunday%20s/Salon-Connect/node_modules/.pnpm/vite@7.3.1_@types+node@25.5_dd6475a36cad374b548325afcd4c0c34/node_modules/vite/dist/node/chunks/config.js:35797:17)
+artifacts/mockup-sandbox dev:     at async loadConfigFromFile (file:///C:/sunday%20s/Salon-Connect/node_modules/.pnpm/vite@7.3.1_@types+node@25.5_dd6475a36cad374b548325afcd4c0c34/node_modules/vite/dist/node/chunks/config.js:35764:42)
+artifacts/mockup-sandbox dev:     at async resolveConfig (file:///C:/sunday%20s/Salon-Connect/node_modules/.pnpm/vite@7.3.1_@types+node@25.5_dd6475a36cad374b548325afcd4c0c34/node_modules/vite/dist/node/chunks/config.js:35413:22)
+artifacts/mockup-sandbox dev:     at async _createServer (file:///C:/sunday%20s/Salon-Connect/node_modules/.pnpm/vite@7.3.1_@types+node@25.5_dd6475a36cad374b548325afcd4c0c34/node_modules/vite/dist/node/chunks/config.js:25362:67)
+artifacts/mockup-sandbox dev:     at async CAC.<anonymous> (file:///C:/sunday%20s/Salon-Connect/node_modules/.pnpm/vite@7.3.1_@types+node@25.5_dd6475a36cad374b548325afcd4c0c34/node_modules/vite/dist/node/cli.js:572:18)[39m
+artifacts/mockup-sandbox dev: Failed
+C:\sunday s\Salon-Connect\artifacts\mockup-sandbox:
+ΓÇëERR_PNPM_RECURSIVE_RUN_FIRST_FAILΓÇë @workspace/mockup-sandbox@2.0.0 dev: `vite dev`
+Exit status 1
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.
