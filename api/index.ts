@@ -5,8 +5,8 @@ import { createClient } from "@supabase/supabase-js";
 
 // --- Env Configuration ---
 // --- Env Configuration ---
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL?.trim();
+const supabaseKey = process.env.SUPABASE_ANON_KEY?.trim();
 
 if (!supabaseUrl || !supabaseKey) {
   console.warn("CRITICAL: SUPABASE_URL or SUPABASE_ANON_KEY is missing. API will fail.");
