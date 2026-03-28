@@ -4,16 +4,17 @@ import * as zod from "zod";
 import { createClient } from "@supabase/supabase-js";
 
 // --- Env Configuration ---
+// --- Env Configuration ---
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn("SUPABASE_URL or SUPABASE_ANON_KEY is missing. API will fail.");
+  console.warn("CRITICAL: SUPABASE_URL or SUPABASE_ANON_KEY is missing. API will fail.");
 }
 
 const supabase = createClient(
-  supabaseUrl || "https://placeholder.supabase.co",
-  supabaseKey || "placeholder"
+  supabaseUrl || "https://missing-url.supabase.co",
+  supabaseKey || "missing-key"
 );
 
 // --- Validation Schemas ---
@@ -119,7 +120,17 @@ function formatSalon(salon: any) {
 
 // Routes
 app.get("/api/healthz", async (req, res) => {
-  res.json({ status: "ok", database: "supabase-sdk" });
+  res.json({ 
+    status: "ok", 
+    database: "supabase-sdk",
+    diagnostics: {
+      hasUrl: !!process.env.SUPABASE_URL,
+      urlLength: process.env.SUPABASE_URL?.length || 0,
+      hasKey: !!process.env.SUPABASE_ANON_KEY,
+      keyLength: process.env.SUPABASE_ANON_KEY?.length || 0,
+      nodeEnv: process.env.NODE_ENV
+    }
+  });
 });
 
 app.get("/api/salons", async (_req, res) => {
