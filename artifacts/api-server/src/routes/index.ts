@@ -5,8 +5,8 @@ import bookingsRouter from "./bookings";
 
 const router: IRouter = Router();
 
-router.use(healthRouter);
-router.use(salonsRouter);
-router.use(bookingsRouter);
+router.use("/", healthRouter);
+router.use("/salons", salonsRouter);
+router.use("/bookings", bookingsRouter);
 
 export default router;
