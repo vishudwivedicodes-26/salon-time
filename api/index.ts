@@ -1,12 +1,12 @@
-import app from "../artifacts/api-server/src/app";
+import express, { type Request, type Response } from "express";
 
-// Direct diagnostic for Vercel
-(app as any).get("/api/vercel-check", (req: any, res: any) => {
+const app = express();
+
+app.get("/api/healthz", (req: Request, res: Response) => {
   res.json({ 
     status: "ok", 
-    message: "Vercel entry point is working",
-    hasDbUrl: !!process.env.DATABASE_URL,
-    nodeEnv: process.env.NODE_ENV
+    mode: "minimal-vercel-entry",
+    hasDbUrl: !!process.env.DATABASE_URL
   });
 });
 
