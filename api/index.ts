@@ -1,50 +1,20 @@
 import express, { type Application } from "express";
 import cors from "cors";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import { pgTable, serial, text, integer, numeric, timestamp } from "drizzle-orm/pg-core";
-import { eq, and } from "drizzle-orm";
 import * as zod from "zod";
+import { createClient } from "@supabase/supabase-js";
 
-const { Pool } = pg;
+// --- Env Configuration ---
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-// --- Database Schema ---
-export const salonsTable = pgTable("salons", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  ownerName: text("owner_name").notNull(),
-  phone: text("phone").notNull(),
-  address: text("address").notNull(),
-  openTime: text("open_time").notNull().default("09:00"),
-  closeTime: text("close_time").notNull().default("20:00"),
-  pin: text("pin").notNull().default("0000"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+if (!supabaseUrl || !supabaseKey) {
+  console.warn("SUPABASE_URL or SUPABASE_ANON_KEY is missing. API will fail.");
+}
 
-export const servicesTable = pgTable("services", {
-  id: serial("id").primaryKey(),
-  salonId: integer("salon_id").notNull().references(() => salonsTable.id),
-  name: text("name").notNull(),
-  description: text("description"),
-  durationMinutes: integer("duration_minutes").notNull().default(30),
-  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const bookingsTable = pgTable("bookings", {
-  id: serial("id").primaryKey(),
-  salonId: integer("salon_id").notNull().references(() => salonsTable.id),
-  serviceId: integer("service_id").notNull().references(() => servicesTable.id),
-  clientName: text("client_name").notNull(),
-  clientPhone: text("client_phone").notNull(),
-  date: text("date").notNull(),
-  time: text("time").notNull(),
-  status: text("status").notNull().default("pending"),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-const schema = { salonsTable, servicesTable, bookingsTable };
+const supabase = createClient(
+  supabaseUrl || "https://placeholder.supabase.co",
+  supabaseKey || "placeholder"
+);
 
 // --- Validation Schemas ---
 export const CreateSalonBody = zod.object({
@@ -54,7 +24,7 @@ export const CreateSalonBody = zod.object({
   address: zod.string(),
   openTime: zod.string(),
   closeTime: zod.string(),
-  pin: zod.string().describe("4-digit PIN for owner dashboard access"),
+  pin: zod.string(),
 });
 
 export const SalonLoginBody = zod.object({
@@ -117,17 +87,6 @@ export const UpdateBookingStatusBody = zod.object({
   status: zod.string(),
 });
 
-// --- Database Connection ---
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL must be set.");
-}
-
-const pool = new Pool({ 
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false } // Required for Supabase in some environments
-});
-const db = drizzle(pool, { schema });
-
 // --- Express App ---
 const app: Application = express();
 
@@ -137,216 +96,359 @@ app.use(express.urlencoded({ extended: true }));
 
 // Helpers
 function stripPin(salon: any) {
+  if (!salon) return null;
   const { pin, ...rest } = salon;
   return rest;
 }
 
 function formatSalon(salon: any) {
-  return stripPin({ ...salon, createdAt: salon.createdAt.toISOString() });
+  if (!salon) return null;
+  // Supabase uses snake_case in DB, map it back to camelCase for frontend
+  return stripPin({
+    id: salon.id,
+    name: salon.name,
+    ownerName: salon.owner_name,
+    phone: salon.phone,
+    address: salon.address,
+    openTime: salon.open_time,
+    closeTime: salon.close_time,
+    pin: salon.pin,
+    createdAt: salon.created_at,
+  });
 }
 
 // Routes
 app.get("/api/healthz", async (req, res) => {
-  res.json({ status: "ok", database: "connected" });
+  res.json({ status: "ok", database: "supabase-sdk" });
 });
 
 app.get("/api/salons", async (_req, res) => {
-  const salons = await db.select().from(salonsTable);
-  res.json(salons.map(s => formatSalon(s)));
+  try {
+    const { data, error } = await supabase.from("salons").select("*");
+    if (error) throw error;
+    res.json((data || []).map(s => formatSalon(s)));
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
+  }
 });
 
 app.post("/api/salons", async (req, res) => {
-  const input = CreateSalonBody.parse(req.body);
-  const [salon] = await db.insert(salonsTable).values(input).returning();
-  res.status(201).json(formatSalon(salon));
+  try {
+    const input = CreateSalonBody.parse(req.body);
+    const { data, error } = await supabase
+      .from("salons")
+      .insert({
+        name: input.name,
+        owner_name: input.ownerName,
+        phone: input.phone,
+        address: input.address,
+        open_time: input.openTime,
+        close_time: input.closeTime,
+        pin: input.pin,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.status(201).json(formatSalon(data));
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
+  }
 });
 
 app.post("/api/salons/login", async (req, res) => {
-  const { salonId, pin } = SalonLoginBody.parse(req.body);
-  const [salon] = await db.select().from(salonsTable).where(eq(salonsTable.id, salonId));
-  if (!salon) {
-    return res.status(404).json({ error: "Salon not found" });
+  try {
+    const { salonId, pin } = SalonLoginBody.parse(req.body);
+    const { data: salon, error } = await supabase
+      .from("salons")
+      .select("*")
+      .eq("id", salonId)
+      .single();
+
+    if (error || !salon) {
+      return res.status(404).json({ error: "Salon not found" });
+    }
+    if (salon.pin !== pin) {
+      return res.status(401).json({ error: "Galat PIN hai. Dobara try karein." });
+    }
+    res.json(formatSalon(salon));
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
   }
-  if (salon.pin !== pin) {
-    return res.status(401).json({ error: "Galat PIN hai. Dobara try karein." });
-  }
-  res.json(formatSalon(salon));
 });
 
 app.get("/api/salons/:salonId", async (req, res) => {
-  const { salonId } = GetSalonParams.parse({ salonId: Number(req.params.salonId) });
-  const [salon] = await db.select().from(salonsTable).where(eq(salonsTable.id, salonId));
-  if (!salon) {
-    return res.status(404).json({ error: "Salon not found" });
+  try {
+    const { salonId } = GetSalonParams.parse({ salonId: Number(req.params.salonId) });
+    const { data: salon, error } = await supabase
+      .from("salons")
+      .select("*")
+      .eq("id", salonId)
+      .single();
+
+    if (error || !salon) {
+      return res.status(404).json({ error: "Salon not found" });
+    }
+    res.json(formatSalon(salon));
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
   }
-  res.json(formatSalon(salon));
 });
 
 app.get("/api/salons/:salonId/services", async (req, res) => {
-  const { salonId } = GetSalonServicesParams.parse({ salonId: Number(req.params.salonId) });
-  const services = await db.select().from(servicesTable).where(eq(servicesTable.salonId, salonId));
-  res.json(services.map(s => ({
-    ...s,
-    price: Number(s.price),
-    createdAt: s.createdAt.toISOString(),
-  })));
+  try {
+    const { salonId } = GetSalonServicesParams.parse({ salonId: Number(req.params.salonId) });
+    const { data: services, error } = await supabase
+      .from("services")
+      .select("*")
+      .eq("salon_id", salonId);
+
+    if (error) throw error;
+    res.json((services || []).map(s => ({
+      id: s.id,
+      salonId: s.salon_id,
+      name: s.name,
+      description: s.description,
+      durationMinutes: s.duration_minutes,
+      price: Number(s.price),
+      createdAt: s.created_at,
+    })));
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
+  }
 });
 
 app.post("/api/salons/:salonId/services", async (req, res) => {
-  const { salonId } = CreateServiceParams.parse({ salonId: Number(req.params.salonId) });
-  const input = CreateServiceBody.parse(req.body);
-  const [service] = await db.insert(servicesTable).values({
-    ...input,
-    salonId,
-    price: String(input.price),
-  }).returning();
-  res.status(201).json({
-    ...service,
-    price: Number(service.price),
-    createdAt: service.createdAt.toISOString(),
-  });
+  try {
+    const { salonId } = CreateServiceParams.parse({ salonId: Number(req.params.salonId) });
+    const input = CreateServiceBody.parse(req.body);
+    const { data: service, error } = await supabase
+      .from("services")
+      .insert({
+        salon_id: salonId,
+        name: input.name,
+        description: input.description,
+        duration_minutes: input.durationMinutes,
+        price: input.price,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.status(201).json({
+      id: service.id,
+      salonId: service.salon_id,
+      name: service.name,
+      description: service.description,
+      durationMinutes: service.duration_minutes,
+      price: Number(service.price),
+      createdAt: service.created_at,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
+  }
 });
 
 app.get("/api/salons/:salonId/slots", async (req, res) => {
-  const { salonId } = GetAvailableSlotsParams.parse({ salonId: Number(req.params.salonId) });
-  const query = GetAvailableSlotsQueryParams.parse({
-    date: req.query.date,
-    serviceId: req.query.serviceId ? Number(req.query.serviceId) : undefined,
-  });
+  try {
+    const { salonId } = GetAvailableSlotsParams.parse({ salonId: Number(req.params.salonId) });
+    const query = GetAvailableSlotsQueryParams.parse({
+      date: req.query.date,
+      serviceId: req.query.serviceId ? Number(req.query.serviceId) : undefined,
+    });
 
-  const [salon] = await db.select().from(salonsTable).where(eq(salonsTable.id, salonId));
-  if (!salon) {
-    return res.status(404).json({ error: "Salon not found" });
+    const { data: salon, error: sErr } = await supabase.from("salons").select("*").eq("id", salonId).single();
+    if (sErr || !salon) {
+      return res.status(404).json({ error: "Salon not found" });
+    }
+
+    let durationMinutes = 30;
+    if (query.serviceId) {
+      const { data: service } = await supabase
+        .from("services")
+        .select("*")
+        .eq("id", query.serviceId)
+        .eq("salon_id", salonId)
+        .single();
+      if (service) durationMinutes = service.duration_minutes;
+    }
+
+    const { data: existingBookings, error: bErr } = await supabase
+      .from("bookings")
+      .select("time, status")
+      .eq("salon_id", salonId)
+      .eq("date", query.date);
+
+    if (bErr) throw bErr;
+    const bookedTimes = new Set((existingBookings || []).filter(b => b.status !== "cancelled").map(b => b.time));
+
+    const slots = [];
+    const [openH, openM] = salon.open_time.split(":").map(Number);
+    const [closeH, closeM] = salon.close_time.split(":").map(Number);
+    const openMinutes = openH * 60 + openM;
+    const closeMinutes = closeH * 60 + closeM;
+
+    for (let m = openMinutes; m + durationMinutes <= closeMinutes; m += durationMinutes) {
+      const hour = Math.floor(m / 60);
+      const min = m % 60;
+      const time = `${String(hour).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+      slots.push({ time, available: !bookedTimes.has(time) });
+    }
+    res.json(slots);
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
   }
-
-  let durationMinutes = 30;
-  if (query.serviceId) {
-    const [service] = await db.select().from(servicesTable).where(
-      and(eq(servicesTable.id, query.serviceId), eq(servicesTable.salonId, salonId))
-    );
-    if (service) durationMinutes = service.durationMinutes;
-  }
-
-  const existingBookings = await db.select().from(bookingsTable).where(
-    and(eq(bookingsTable.salonId, salonId), eq(bookingsTable.date, query.date))
-  );
-  const bookedTimes = new Set(existingBookings.filter(b => b.status !== "cancelled").map(b => b.time));
-
-  const slots = [];
-  const [openH, openM] = salon.openTime.split(":").map(Number);
-  const [closeH, closeM] = salon.closeTime.split(":").map(Number);
-  const openMinutes = openH * 60 + openM;
-  const closeMinutes = closeH * 60 + closeM;
-
-  for (let m = openMinutes; m + durationMinutes <= closeMinutes; m += durationMinutes) {
-    const hour = Math.floor(m / 60);
-    const min = m % 60;
-    const time = `${String(hour).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
-    slots.push({ time, available: !bookedTimes.has(time) });
-  }
-  res.json(slots);
 });
 
 app.get("/api/bookings", async (req, res) => {
-  const query = GetBookingsQueryParams.parse({
-    salonId: req.query.salonId ? Number(req.query.salonId) : undefined,
-    date: req.query.date as string | undefined,
-  });
+  try {
+    const query = GetBookingsQueryParams.parse({
+      salonId: req.query.salonId ? Number(req.query.salonId) : undefined,
+      date: req.query.date as string | undefined,
+    });
 
-  let rows = await db.select({
-    booking: bookingsTable,
-    service: servicesTable,
-  })
-    .from(bookingsTable)
-    .innerJoin(servicesTable, eq(bookingsTable.serviceId, servicesTable.id));
+    let sbQuery = supabase
+      .from("bookings")
+      .select("*, services(name)");
 
-  if (query.salonId) {
-    rows = rows.filter(r => r.booking.salonId === query.salonId);
+    if (query.salonId) sbQuery = sbQuery.eq("salon_id", query.salonId);
+    if (query.date) sbQuery = sbQuery.eq("date", query.date);
+
+    const { data, error } = await sbQuery;
+    if (error) throw error;
+
+    res.json((data || []).map((b: any) => ({
+      id: b.id,
+      salonId: b.salon_id,
+      serviceId: b.service_id,
+      clientName: b.client_name,
+      clientPhone: b.client_phone,
+      date: b.date,
+      time: b.time,
+      status: b.status,
+      notes: b.notes,
+      serviceName: b.services?.name ?? "",
+      createdAt: b.created_at,
+    })));
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
   }
-  if (query.date) {
-    rows = rows.filter(r => r.booking.date === query.date);
-  }
-
-  res.json(rows.map(r => ({
-    ...r.booking,
-    serviceName: r.service.name,
-    createdAt: r.booking.createdAt.toISOString(),
-  })));
 });
 
 app.post("/api/bookings", async (req, res) => {
-  const input = CreateBookingBody.parse(req.body);
+  try {
+    const input = CreateBookingBody.parse(req.body);
 
-  const conflict = await db.select().from(bookingsTable).where(
-    and(
-      eq(bookingsTable.salonId, input.salonId),
-      eq(bookingsTable.date, input.date),
-      eq(bookingsTable.time, input.time),
-    )
-  );
+    const { data: conflict, error: cErr } = await supabase
+      .from("bookings")
+      .select("*")
+      .eq("salon_id", input.salonId)
+      .eq("date", input.date)
+      .eq("time", input.time)
+      .neq("status", "cancelled");
 
-  const active = conflict.filter(b => b.status !== "cancelled");
-  if (active.length > 0) {
-    return res.status(400).json({ error: "This time slot is already booked." });
+    if (cErr) throw cErr;
+    if (conflict && conflict.length > 0) {
+      return res.status(400).json({ error: "This time slot is already booked." });
+    }
+
+    const { data: booking, error: bErr } = await supabase
+      .from("bookings")
+      .insert({
+        salon_id: input.salonId,
+        service_id: input.serviceId,
+        client_name: input.clientName,
+        client_phone: input.clientPhone,
+        date: input.date,
+        time: input.time,
+        notes: input.notes,
+        status: "pending",
+      })
+      .select("*, services(name)")
+      .single();
+
+    if (bErr) throw bErr;
+    res.status(201).json({
+      id: booking.id,
+      salonId: booking.salon_id,
+      serviceId: booking.service_id,
+      clientName: booking.client_name,
+      clientPhone: booking.client_phone,
+      date: booking.date,
+      time: booking.time,
+      status: booking.status,
+      notes: booking.notes,
+      serviceName: booking.services?.name ?? "",
+      createdAt: booking.created_at,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
   }
-
-  const [booking] = await db.insert(bookingsTable).values({
-    ...input,
-    status: "pending",
-  }).returning();
-
-  const [service] = await db.select().from(servicesTable).where(eq(servicesTable.id, booking.serviceId));
-
-  res.status(201).json({
-    ...booking,
-    serviceName: service?.name ?? "",
-    createdAt: booking.createdAt.toISOString(),
-  });
 });
 
 app.get("/api/bookings/:bookingId", async (req, res) => {
-  const { bookingId } = GetBookingParams.parse({ bookingId: Number(req.params.bookingId) });
-  const rows = await db.select({
-    booking: bookingsTable,
-    service: servicesTable,
-  })
-    .from(bookingsTable)
-    .innerJoin(servicesTable, eq(bookingsTable.serviceId, servicesTable.id))
-    .where(eq(bookingsTable.id, bookingId));
+  try {
+    const { bookingId } = GetBookingParams.parse({ bookingId: Number(req.params.bookingId) });
+    const { data: booking, error } = await supabase
+      .from("bookings")
+      .select("*, services(name)")
+      .eq("id", bookingId)
+      .single();
 
-  if (rows.length === 0) {
-    return res.status(404).json({ error: "Booking not found" });
+    if (error || !booking) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    res.json({
+      id: booking.id,
+      salonId: booking.salon_id,
+      serviceId: booking.service_id,
+      clientName: booking.client_name,
+      clientPhone: booking.client_phone,
+      date: booking.date,
+      time: booking.time,
+      status: booking.status,
+      notes: booking.notes,
+      serviceName: booking.services?.name ?? "",
+      createdAt: booking.created_at,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
   }
-
-  const { booking, service } = rows[0];
-  res.json({
-    ...booking,
-    serviceName: service.name,
-    createdAt: booking.createdAt.toISOString(),
-  });
 });
 
 app.patch("/api/bookings/:bookingId", async (req, res) => {
-  const { bookingId } = UpdateBookingStatusParams.parse({ bookingId: Number(req.params.bookingId) });
-  const { status } = UpdateBookingStatusBody.parse(req.body);
+  try {
+    const { bookingId } = UpdateBookingStatusParams.parse({ bookingId: Number(req.params.bookingId) });
+    const { status } = UpdateBookingStatusBody.parse(req.body);
 
-  const [booking] = await db
-    .update(bookingsTable)
-    .set({ status })
-    .where(eq(bookingsTable.id, bookingId))
-    .returning();
+    const { data: booking, error: uErr } = await supabase
+      .from("bookings")
+      .update({ status })
+      .eq("id", bookingId)
+      .select("*, services(name)")
+      .single();
 
-  if (!booking) {
-    return res.status(404).json({ error: "Booking not found" });
+    if (uErr || !booking) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    res.json({
+      id: booking.id,
+      salonId: booking.salon_id,
+      serviceId: booking.service_id,
+      clientName: booking.client_name,
+      clientPhone: booking.client_phone,
+      date: booking.date,
+      time: booking.time,
+      status: booking.status,
+      notes: booking.notes,
+      serviceName: booking.services?.name ?? "",
+      createdAt: booking.created_at,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Internal Server Error", message: err.message });
   }
-
-  const [service] = await db.select().from(servicesTable).where(eq(servicesTable.id, booking.serviceId));
-
-  res.json({
-    ...booking,
-    serviceName: service?.name ?? "",
-    createdAt: booking.createdAt.toISOString(),
-  });
 });
 
 // Detailed Error Handler for Debugging
@@ -355,30 +457,9 @@ app.use((err: any, req: any, res: any, next: any) => {
   res.status(500).json({ 
     error: "Internal Server Error", 
     message: err.message,
-    stack: err.stack,
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
     path: req.path
   });
 });
-
-// Startup Seed
-(async () => {
-    try {
-        const existing = await db.select().from(salonsTable).limit(1);
-        if (existing.length === 0) {
-            await db.insert(salonsTable).values({
-                name: "Test Salon",
-                ownerName: "Test Owner",
-                address: "123 Main St",
-                phone: "1234567890",
-                openTime: "09:00",
-                closeTime: "20:00",
-                pin: "1234",
-            });
-            console.log("Database seeded with test salon.");
-        }
-    } catch (e) {
-        console.error("Seed failed:", e);
-    }
-})();
 
 export default app;
