@@ -349,6 +349,17 @@ app.patch("/api/bookings/:bookingId", async (req, res) => {
   });
 });
 
+// Detailed Error Handler for Debugging
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error("API Error:", err);
+  res.status(500).json({ 
+    error: "Internal Server Error", 
+    message: err.message,
+    stack: err.stack,
+    path: req.path
+  });
+});
+
 // Startup Seed
 (async () => {
     try {
