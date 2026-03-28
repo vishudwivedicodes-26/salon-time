@@ -6,6 +6,7 @@
   "engines": {
     "node": "22.x"
   },
+  "type": "module",
   "scripts": {
     "build": "node scripts/build-prod.js",
     "dev": "pnpm -r --filter @workspace/api-server --filter @workspace/salon-booking --parallel dev",
